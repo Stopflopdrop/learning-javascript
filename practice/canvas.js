@@ -14,62 +14,69 @@ class ClickBox {
 		this.size = size;
 
 		this.isClicked = false;
-		this.refreshRate = 500;
+		this.refreshRate = 100;
 		this.lastRefresh = 0;
-		this.colors = colors
+		this.colors = colors;
 		this.color = "red";
 
-		
+		this.setColor();
 	}
-	update() {}
-	draw() {}
+
+	setColor() {
+		let colorIndex = Math.floor(Math.random() * this.colors.length);
+		this.color = this.colors[colorIndex];
+	}
+
+	update(timeElapsed) {
+		this.lastRefresh += timeElapsed;
+
+		if (this.lastRefresh < this.refreshRate) return;
+
+		// reset the last refresh counter
+		this.lastRefresh = 0;
+
+		// set a new random color to myself
+		this.setColor();
+	}
+
+	draw() {
+		// let square = new Path2D();
+		// square.rect(x, y, size, size);
+
+		context.fillStyle = this.color;
+		context.fillRect(this.x, this.y, this.size, this.size);
+	}
 }
 
 let squares = [];
-let colSize = 1;
 let gridSize = 250;
 let size = canvas.width / gridSize;
-let colors = ["red", "orange", "yellow", "green", "blue", "indigo", "violet"];
+let colors = ["purple", "violet", "indigo", "pink", "violet", "purple", "pink"];
 
-// All of these incrementors do the same
-// row = row + 1
-// row +=  1
-// row++
 for (let row = 0; row < gridSize; row++) {
 	for (let col = 0; col < gridSize; col++) {
-		let colorIndex = Math.floor(Math.random() * colors.length);
-		let color = colors[colorIndex];
-		drawSquare(col * size, row * size, color, size);
+		let x = col * size;
+		let y = row * size;
+		let box = new ClickBox(x, y, size, colors);
+		squares.push(box);
 	}
 }
 
-// drawSquare(0, 0, "red");
-// drawSquare(25, 0, "blue");
-// drawSquare(50, 0, "green");
-// drawSquare(75, 0, "purple");
+let currentTime = 0;
 
-function drawSquare(x, y, color, size = 25) {
-	let square = new Path2D();
-	square.rect(x, y, size, size);
+function drawLoop(timestamp) {
+	let elapsedTime = timestamp - currentTime;
+	currentTime = timestamp;
 
-	squares.push(square);
+	squares.forEach((b) => {
+		b.update(elapsedTime);
+		b.draw();
+	});
 
-	context.fillStyle = color;
-	context.fillRect(x, y, size, size);
-}
-
-console.log(squares);
-const refreshRate = 500;
-
-function drawLoop() {
-	for (let row = 0; row < gridSize; row++) {
-		for (let col = 0; col < gridSize; col++) {
-			let colorIndex = Math.floor(Math.random() * colors.length);
-			let color = colors[colorIndex];
-			drawSquare(col * size, row * size, color, size);
-		}
-	}
 	requestAnimationFrame(drawLoop);
 }
 
 requestAnimationFrame(drawLoop);
+
+
+

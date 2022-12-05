@@ -18,4 +18,5 @@ export {};
 /** @type {HTMLPreElement} */ //@ts-ignore
 const output = document.getElementById("output-container");
 
+console.log
 // your code will start here.
